@@ -60,40 +60,32 @@ const myQuestion = 'Can you name me 10 colors?';
 console.log('My question: ', myQuestion);
 
 
-async function streamGenerateContent() {
-    // const chat = generativeModel.startChat({
-    //   tools: functionDeclarations,
-    // });
+async function streamChat() {
+    const chat = generativeModel.startChat();
+    const chatInput = myQuestion;
+    const result = await chat.sendMessageStream(chatInput);
 
-    const request = {
-        contents: [{
-            role: 'user', 
-            parts: [{ text: myQuestion }]
-        }],
-    };
-    const streamingResult = await 
-
-
-    generativeModel.generateContentStream(request);
-
-    // for await (const item of streamingResult.stream) {
-
-    //     console.log('stream chunk: ', JSON.stringify(item));
-    //     // try to make this more readable
-    //     console.log('\n'); 
-
+    // for await (const item of result.stream) {
+    //     console.log("Stream chunk: ", item.candidates[0].content.parts[0].text);
     // }
-    const aggregatedResponse = await streamingResult.response;
+    
+    const aggregatedResponse = await result.response;
+    // console.log('Aggregated response: ', JSON.stringify(aggregatedResponse));
+    // final response:
 
-    console.log('aggregated response: ', JSON.stringify(aggregatedResponse));
-
-    // Note; the index [0] is hardcoded but dont know if this could change
     const reply = aggregatedResponse.candidates[0].content.parts[0].text;
 
     // final response:
     console.log('Ai reply:', reply);
     // console.log('aggregatedResponse.candidates[0].content.parts', aggregatedResponse.candidates[0].content.parts);
 
-};
+    // ------------------
+    // 2nd question
+    const result2 = await chat.sendMessageStream('can you list them in alphabetical order?');
+    const aggregatedResponse2 = await result2.response;
+    const reply2 = aggregatedResponse2.candidates[0].content.parts[0].text;
+    console.log('Ai 2nd reply:', reply2);
 
-streamGenerateContent();
+}
+
+streamChat();
